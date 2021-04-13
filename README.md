@@ -14,8 +14,7 @@ Use whatever virtual environment you prefer. For example with virtualenv:
 
 ### Install requirements 
 `pip install -r requirements.txt`  
-The script uses Selenium which requires the correct chrome driver binary to work. If you upgrade your version of Google Chrome and the script no longer works, run this to automatically update the driver:  
-`pip install --upgrade --force-reinstall chromedriver-binary-auto`
+Chrome driver binaries are managed by https://github.com/SergeyPirogov/webdriver_manager, so the correct binary for your version of Chrome should be automatically downloaded upon running the script. 
 
 ## Usage
 `python export_penzu_data.py JOURNAl_ID LOGIN_EMAIL LOGIN_PASSWORD`  
@@ -37,10 +36,11 @@ Sometimes the script finds no entries even on page 1 and immediately exits. Usua
 HTML formatting in journal text is ignored, only the text is exported.
 
 ## Notes
-This is a personal project, I have no affiliation with Penzu.  
-
 There's a lot of manual sleeping for a hardcoded number of seconds to wait for pages to load, which can cause the script to go slower than necessary or crash when the page hasn't loaded yet. On average it takes about 2 seconds per journal entry, so unless you have many thousands of entries the speed isn't a major issue.
 
 Developed and tested with Python3.9, should probably work with any version that includes f-strings (i.e. 3.6+).  
 
-Tested on Mac, so the Selenium stuff might be glitchy on another OS.  
+Tested on Mac, so the Selenium and Chrome driver stuff might be glitchy on another OS.  
+
+This is a personal project, I have no affiliation with Penzu.  
+
