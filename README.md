@@ -5,6 +5,8 @@ This is a command line program written in Python that uses Selenium to iterate t
 
 ## Setup
 
+This assumes you have Python3 (and pip) installed, as well as Google Chrome. 
+
 ### Clone the repo
 `git clone https://github.com/ianmcaulay/penzu-export`  
 `cd penzu-export`
