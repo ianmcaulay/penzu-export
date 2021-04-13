@@ -21,7 +21,7 @@ The script uses Selenium which requires the correct chrome driver binary to work
 `python export_penzu_data.py JOURNAl_ID LOGIN_EMAIL LOGIN_PASSWORD`  
 Optionally add the `--headless` flag to run Selenium in headless mode (i.e. without displaying a window). 
 
-To find a journal's journal ID, go to it's list of entries. The URL should look like this: https://penzu.com/journals/{JOURNAL_ID}/entries. The journal ID should look something like this: 24766000.
+To find a journal's journal ID, go to it's list of entries on penzu.com. The URL should look like this: https://penzu.com/journals/{JOURNAL_ID}/entries. The journal ID should look something like this: 24766000.
 
 The output is a csv called `penzu_entries.csv` with these columns:  
 `entry_id` - Penzu interal ID for each entry (I assume this is unique even across different journals but I don't know for sure)  
@@ -39,7 +39,7 @@ HTML formatting in journal text is ignored, only the text is exported.
 ## Notes
 This is a personal project, I have no affiliation with Penzu.  
 
-There's a lot of manual sleeping for a hardcoded number of seconds to wait for pages to load, which can cause the script to go slower than necessary or crash when 
+There's a lot of manual sleeping for a hardcoded number of seconds to wait for pages to load, which can cause the script to go slower than necessary or crash when the page hasn't loaded yet. On average it takes about 2 seconds per journal entry, so unless you have many thousands of entries the speed isn't a major issue.
 
 Developed and tested with Python3.9, should probably work with any version that includes f-strings (i.e. 3.6+).  
 
