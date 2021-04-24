@@ -83,6 +83,7 @@ def get_entries_df():
 
 def login(driver, email, password, manual_input=False):
     get_url(driver, 'https://penzu.com/app/login')
+    # TODO: add this flag as a cmd line option, right now it's always False.
     if manual_input:
         input('Please login and press enter...')
     else:
