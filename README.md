@@ -27,8 +27,8 @@ Optionally add the `--headless` flag to run Selenium in headless mode (i.e. with
 To find a journal's journal ID, go to it's list of entries on penzu.com. The URL should look like this: https://penzu.com/journals/{JOURNAL_ID}/entries. The journal ID should look like this: 24766000.
 
 The output is a csv called `penzu_entries.csv` with these columns:  
-* `entry_id` - Penzu interal ID for each entry (I assume this is unique even across different journals but I don't know for sure)  
-* `journal_id` - Penzu interal ID for each journal  
+* `entry_id` - Penzu internal ID for each entry (I assume this is unique even across different journals but I don't know for sure)  
+* `journal_id` - Penzu internal ID for each journal  
 * `content` - The text content of the journal entry  
 * `title` - The title of the entry (if no title is set Penzu defaults to the date)  
 * `created_at` - The Penzu display created at, for me it's always in this format: `Thu. 1/1/1970 at 1:00am` (something like `"%a. %d/%m/%Y at %I:%M%p"` for string formatting, although note there are no leading zeros)  
