@@ -38,7 +38,11 @@ def get_args():
     parser.add_argument('password',
                         help='Password for Penzu login')
     parser.add_argument('--headless', default=False, action='store_true',
-                        help="By default the Selenium driver is not headless, add this flag to make it headless")
+                        help="By default the Selenium driver is not headless, add this flag to make it headless.")
+    parser.add_argument('--manual_login', default=False, action='store_true', 
+                        help='Use this flag to login manually instead of passing email and password via command '
+                             'line. This is necessary when Penzu login requires captcha.')
+    # TODO: allow email and password to be optional when manual_login is True
     return parser.parse_args()
 
 
@@ -81,10 +85,10 @@ def get_entries_df():
     return df
 
 
-def login(driver, email, password, manual_input=False):
+def login(driver, email, password, manual_login):
     get_url(driver, 'https://penzu.com/app/login')
-    # TODO: add this flag as a cmd line option, right now it's always False.
-    if manual_input:
+    # TODO: fix arguments to require either (email and password) or manual_login
+    if manual_login:
         input('Please login and press enter...')
     else:
         email_input = driver.find_element_by_id('email')
@@ -121,7 +125,7 @@ def retry_get_entries_from_entries_url(driver, entries_url):
             max_retries -= 1
             if max_retries <= 0:
                 raise e
-            print('Stale element exception, sleeping and retrying...')
+            print('WARNING: Stale element exception, sleeping and retrying...')
             time.sleep(3)
 
 
@@ -164,11 +168,11 @@ def save_entry_data(df, entry_data):
     return df
 
 
-def get_all_entries_data(journal_id, email, password, headless):
+def get_all_entries_data(journal_id, email, password, headless, manual_login):
     df = get_entries_df()
     try:
         driver = get_driver(headless)
-        login(driver, email, password)
+        login(driver, email, password, manual_login)
         for entry in get_all_entries(driver, journal_id):
             if entry.entry_id in df.index:
                 print(f'Skipping entry {entry.entry_id} which has already been fetched')
@@ -176,11 +180,12 @@ def get_all_entries_data(journal_id, email, password, headless):
                 print(f'Fetching entry {entry.entry_id}')
                 entry_data = get_entry_data(driver, entry)
                 df = save_entry_data(df, entry_data)
+        print(f'Total number of entries: {len(df)}')
     finally:
         driver.quit()
 
 
 if __name__ == '__main__':
     args = get_args()
-    get_all_entries_data(args.journal_id, args.email, args.password, args.headless)
+    get_all_entries_data(args.journal_id, args.email, args.password, args.headless, args.manual_login)
 

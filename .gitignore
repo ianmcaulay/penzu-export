@@ -2,3 +2,4 @@ penzu_entries.csv
 test_data.json
 
 *.swp
+.DS_store
