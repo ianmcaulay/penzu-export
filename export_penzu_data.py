@@ -15,7 +15,7 @@ SLEEP_AFTER_LOGIN = 1
 SLEEP_AFTER_PAGE_LOAD = 1
 MAX_TIMEOUT = 30
 ENTRIES_CSV = Path('penzu_entries.csv')
-ENTRY_URL_PATTERN = re.compile(r'https://penzu.com/journals/([\d]*)/([\d]*)')
+ENTRY_URL_PATTERN = re.compile(r'https://penzu.com/journals/(\d*)/(\d*)')
 
 
 class Entry:
