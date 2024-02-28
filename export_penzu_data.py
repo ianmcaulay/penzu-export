@@ -11,7 +11,7 @@ import undetected_chromedriver as uc
 
 # All sleep times are in seconds.
 SLEEP_AFTER_LOGIN = 1
-SLEEP_AFTER_PAGE_LOAD = 1
+SLEEP_AFTER_PAGE_LOAD = 2
 MAX_TIMEOUT = 30
 ENTRIES_CSV = Path('penzu_entries.csv')
 ENTRY_URL_PATTERN = re.compile(r'https://penzu.com/journals/(\d*)/(\d*)')
@@ -116,7 +116,11 @@ def get_all_entries(driver, journal_id):
 
 def get_entry_data(driver, entry):
     get_url(driver, entry.entry_url)
-    text_element = get_only_element(driver.find_elements(By.CLASS_NAME, 'cke_inner'))
+    try:
+        text_element = get_only_element(driver.find_elements(By.CLASS_NAME, 'cke_inner'))
+    except ValueError:
+        time.sleep(10)
+        text_element = get_only_element(driver.find_elements(By.CLASS_NAME, 'cke_inner'))
     text = text_element.text
     title_element = get_only_element(driver.find_elements(By.CLASS_NAME, 'h1'))
     title = title_element.get_property('value')
