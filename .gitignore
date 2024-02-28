@@ -1,7 +1,6 @@
 penzu_entries.csv
-test_data.json
 
-.env
+venv
 
 *.swp
 .DS_store
