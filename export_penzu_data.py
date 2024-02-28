@@ -1,13 +1,12 @@
-import re
-import time
-import pandas as pd
 import argparse
 from pathlib import Path
-from selenium import webdriver
+import re
+import time
+
+import pandas as pd
 from selenium.common.exceptions import StaleElementReferenceException
-from webdriver_manager.chrome import ChromeDriverManager
-from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium.webdriver.common.by import By
+import undetected_chromedriver as uc
 
 
 # All sleep times are in seconds.
@@ -35,16 +34,6 @@ def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('journal_id',
                         help='Journal ID of Penzu journal to export (should look something like this: 24766000)')
-    parser.add_argument('email',
-                        help='Email for Penzu login')
-    parser.add_argument('password',
-                        help='Password for Penzu login')
-    parser.add_argument('--headless', default=False, action='store_true',
-                        help="By default the Selenium driver is not headless, add this flag to make it headless.")
-    parser.add_argument('--manual_login', default=False, action='store_true', 
-                        help='Use this flag to login manually instead of passing email and password via command '
-                             'line. This is necessary when Penzu login requires captcha.')
-    # TODO: allow email and password to be optional when manual_login is True
     return parser.parse_args()
 
 
@@ -64,13 +53,8 @@ def wait_for_page_load(driver):
     time.sleep(SLEEP_AFTER_PAGE_LOAD)
 
 
-def get_driver(headless):
-    options = webdriver.ChromeOptions()
-    if headless:
-        options.add_argument("--headless")
-    options.add_argument("--disable-extensions")
-    driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=options)
-
+def get_driver():
+    driver = uc.Chrome(use_subprocess=True)
     return driver
 
 
@@ -87,23 +71,6 @@ def get_entries_df():
             'fetched_at'])
     df = df.set_index('entry_id')
     return df
-
-
-def login(driver, email, password, manual_login):
-    get_url(driver, 'https://penzu.com/app/login')
-    # TODO: fix arguments to require either (email and password) or manual_login
-    if manual_login:
-        input('Please login and press enter...')
-    else:
-        email_input = driver.find_element(By.ID, 'email')
-        email_input.clear()
-        email_input.send_keys(email)
-        password_input = driver.find_element(By.ID, 'password')
-        password_input.clear()
-        password_input.send_keys(password)
-        driver.find_element(By.CLASS_NAME, 'js-login-submit').click()
-        wait_for_page_load(driver)
-        time.sleep(SLEEP_AFTER_LOGIN)
 
 
 def get_entries_from_entries_url(driver, entries_url):
@@ -164,28 +131,31 @@ def get_entry_data(driver, entry):
     return entry_data
 
 
-def save_entry_data(df, entry_data):
+def save_entry_data(entry_data):
     new_df = pd.DataFrame([entry_data])
     new_df = new_df.set_index('entry_id')
-    df = df.append(new_df)
-    df.to_csv(ENTRIES_CSV)
-    return df
+    mode = 'w' if not ENTRIES_CSV.exists() else 'a'
+    include_header = not ENTRIES_CSV.exists()
+    new_df.to_csv(ENTRIES_CSV, header=include_header, mode=mode)
 
 
-def get_all_entries_data(journal_id, email, password, headless, manual_login):
+def get_all_entries_data(journal_id):
     df = get_entries_df()
     driver = None
     try:
-        driver = get_driver(headless)
-        login(driver, email, password, manual_login)
+        driver = get_driver()
+        input('Open a new tab, visit https://penzu.com/app/login and login and press enter...')
+        driver.switch_to.window(driver.current_window_handle)
+        num_new_entries = 0
         for entry in get_all_entries(driver, journal_id):
             if entry.entry_id in df.index:
                 print(f'Skipping entry {entry.entry_id} which has already been fetched')
             else:
                 print(f'Fetching entry {entry.entry_id}')
                 entry_data = get_entry_data(driver, entry)
-                df = save_entry_data(df, entry_data)
-        print(f'Total number of entries: {len(df)}')
+                save_entry_data(entry_data)
+                num_new_entries += 1
+        print(f'Total number of entries: {len(df) + num_new_entries} (added {num_new_entries} new entries)')
     finally:
         if driver:
             driver.quit()
@@ -193,5 +163,4 @@ def get_all_entries_data(journal_id, email, password, headless, manual_login):
 
 if __name__ == '__main__':
     args = get_args()
-    get_all_entries_data(args.journal_id, args.email, args.password, args.headless, args.manual_login)
-
+    get_all_entries_data(args.journal_id)
