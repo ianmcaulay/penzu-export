@@ -25,7 +25,7 @@ class Entry:
         self.journal_id, self.entry_id = ENTRY_URL_PATTERN.match(entry_url).groups()
 
 
-def singleton(lst):
+def get_only_element(lst):
     assert len(lst) == 1, f'Expected length 1, got length {len(lst)} in list {lst}.'
     return lst[0]
 
@@ -77,10 +77,10 @@ def get_entries_from_entries_url(driver, entries_url):
     get_url(driver, entries_url)
     entries = []
     for entry_element in driver.find_elements(By.CLASS_NAME, 'entries-list__item'):
-        entry_title_element = singleton(entry_element.find_elements(By.CSS_SELECTOR, '.title.item__cell'))
-        entry_url_element = singleton(entry_title_element.find_elements(By.TAG_NAME, 'a'))
+        entry_title_element = get_only_element(entry_element.find_elements(By.CSS_SELECTOR, '.title.item__cell'))
+        entry_url_element = get_only_element(entry_title_element.find_elements(By.TAG_NAME, 'a'))
         entry_url = entry_url_element.get_attribute('href')
-        created_at_element = singleton(entry_element.find_elements(By.CSS_SELECTOR, '.date.item__cell'))
+        created_at_element = get_only_element(entry_element.find_elements(By.CSS_SELECTOR, '.date.item__cell'))
         created_at = created_at_element.text
         entries.append(Entry(entry_url, created_at))
 
@@ -115,9 +115,9 @@ def get_all_entries(driver, journal_id):
 
 def get_entry_data(driver, entry):
     get_url(driver, entry.entry_url)
-    text_element = singleton(driver.find_elements(By.CLASS_NAME, 'cke_inner'))
+    text_element = get_only_element(driver.find_elements(By.CLASS_NAME, 'cke_inner'))
     text = text_element.text
-    title_element = singleton(driver.find_elements(By.CLASS_NAME, 'h1'))
+    title_element = get_only_element(driver.find_elements(By.CLASS_NAME, 'h1'))
     title = title_element.get_property('value')
 
     entry_data = {
