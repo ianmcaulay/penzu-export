@@ -26,7 +26,8 @@ class Entry:
 
 
 def get_only_element(lst):
-    assert len(lst) == 1, f'Expected length 1, got length {len(lst)} in list {lst}.'
+    if len(lst) != 1:
+        raise ValueError(f'Expected length 1, got length {len(lst)} in list {lst}.')
     return lst[0]
 
 
